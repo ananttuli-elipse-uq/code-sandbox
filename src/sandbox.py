@@ -5,20 +5,28 @@ Sandboxes code execution
 """
 
 from os.path import join
-from subprocess import Popen, run, PIPE
+from subprocess import Popen, run, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
+from typing import List
 from xvfbwrapper import Xvfb
+from .types import Files
 
 TIMEOUT = 1
 ENTRYPOINT = "test.py"
 PYTHON_EXEC = "python3"
 FIREJAIL_EXEC = "firejail"
 
-def get_firejail_args(tmp_path):
+def get_firejail_args(tmp_path: str) -> List[str]:
     """ Gets the firejail command to run """
-    return [FIREJAIL_EXEC, "--private={}".format(tmp_path), PYTHON_EXEC, join("~", ENTRYPOINT)]
+    return [
+        FIREJAIL_EXEC,
+        "--private={}".format(tmp_path),
+        "--quiet",
+        PYTHON_EXEC,
+        join(tmp_path, ENTRYPOINT)
+    ]
 
-def write_files(tmp_path, files):
+def write_files(tmp_path: str, files: Files):
     """ Writes a dictionary containing a mapping of filenames to contents
     to the given path
     """
@@ -29,7 +37,7 @@ def write_files(tmp_path, files):
         with open(full_path, "w") as tmp_file:
             tmp_file.write(files[filename])
 
-def run_code(files):
+def run_code(files: Files):
     """
     Securely runs code within a sandbox in a temp directory
 
@@ -41,12 +49,12 @@ def run_code(files):
         args = get_firejail_args(tmp)
 
         firejail = run(args, stdout=PIPE, stderr=PIPE)
-        print(" ".join(args))
         print(firejail.stdout)
         print(firejail.stderr)
 
 
-def run_gui_code(files):
+
+def run_gui_code(files: Files):
     """
     Securely runs code within a sandbox in a temp directory
 
@@ -64,11 +72,11 @@ def run_gui_code(files):
         with Xvfb() as display:
             # Launch the tkinter problem
             args = "python3 " + script_name
-            with Popen(args, shell=True, executable="/bin/bash", stdout=PIPE, stderr=PIPE) as p:
+            with Popen(args, shell=True, executable="/bin/bash", stdout=PIPE, stderr=PIPE) as proc:
                 try:
-                    p.wait(TIMEOUT)
+                    proc.wait(TIMEOUT)
                     print("Process exited before screen capture")
-                except Exception as e:
+                except TimeoutExpired:
                     # Capture the screen
                     display_num = display.new_display
                     print("Capturing...")
@@ -76,12 +84,13 @@ def run_gui_code(files):
                         .format(display_num), shell=True)
 
                     # Kill the child if it doesn't exit automaticallyj
-                    p.kill()
+                    proc.kill()
 
 
 if __name__ == "__main__":
     FILES = {
-        "test.py": "print('Hello world')"
+        "test.py": "import file2\nprint('Hello world')",
+        "file2.py": "print('Loaded file 2')"
     }
 
     run_code(FILES)
