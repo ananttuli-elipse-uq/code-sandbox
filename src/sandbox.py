@@ -9,7 +9,7 @@ from subprocess import Popen, run, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
 from typing import List
 from xvfbwrapper import Xvfb
-from .types import Files
+from typings import Files, TestResult
 
 TIMEOUT = 1
 ENTRYPOINT = "test.py"
@@ -37,7 +37,7 @@ def write_files(tmp_path: str, files: Files):
         with open(full_path, "w") as tmp_file:
             tmp_file.write(files[filename])
 
-def run_code(files: Files):
+def run_code(files: Files) -> TestResult:
     """
     Securely runs code within a sandbox in a temp directory
 
@@ -49,8 +49,13 @@ def run_code(files: Files):
         args = get_firejail_args(tmp)
 
         firejail = run(args, stdout=PIPE, stderr=PIPE)
-        print(firejail.stdout)
-        print(firejail.stderr)
+
+    result = TestResult()
+    result.stdout = firejail.stdout.decode()
+    result.stderr = firejail.stderr.decode()
+    result.exitCode = firejail.returncode
+
+    return result
 
 
 
@@ -62,17 +67,12 @@ def run_gui_code(files: Files):
     """
     with TemporaryDirectory() as tmp:
 
-
         write_files(tmp, files)
-        # Copy files
-
-
-        script_name = "test.py"
 
         with Xvfb() as display:
             # Launch the tkinter problem
-            args = "python3 " + script_name
-            with Popen(args, shell=True, executable="/bin/bash", stdout=PIPE, stderr=PIPE) as proc:
+            args = get_firejail_args(tmp)
+            with Popen(args, stdout=PIPE, stderr=PIPE) as proc:
                 try:
                     proc.wait(TIMEOUT)
                     print("Process exited before screen capture")
@@ -93,4 +93,4 @@ if __name__ == "__main__":
         "file2.py": "print('Loaded file 2')"
     }
 
-    run_code(FILES)
+    print(run_code(FILES))
