@@ -18,6 +18,7 @@ FIREJAIL_EXEC = "firejail"
 
 def get_firejail_args(tmp_path: str) -> List[str]:
     """ Gets the firejail command to run """
+
     return [
         FIREJAIL_EXEC,
         "--private={}".format(tmp_path),
@@ -25,6 +26,19 @@ def get_firejail_args(tmp_path: str) -> List[str]:
         PYTHON_EXEC,
         join(tmp_path, ENTRYPOINT)
     ]
+
+def get_x11_firejail_args(tmp_path: str, display_num: int) -> List[str]:
+    """ Gets the x11 firejail parameters """
+
+    args = [
+        # "DISPLAY=:{}".format(display_num)
+    ]
+
+    args.extend(get_firejail_args(tmp_path))
+
+    args.append("--x11")
+
+    return args
 
 def write_files(tmp_path: str, files: Files):
     """ Writes a dictionary containing a mapping of filenames to contents
@@ -71,26 +85,31 @@ def run_gui_code(files: Files):
 
         with Xvfb() as display:
             # Launch the tkinter problem
-            args = get_firejail_args(tmp)
+            display_num = display.new_display
+            args = get_x11_firejail_args(tmp, display_num)
+            print(" ".join(args))
             with Popen(args, stdout=PIPE, stderr=PIPE) as proc:
                 try:
                     proc.wait(TIMEOUT)
-                    print("Process exited before screen capture")
+                    raise RuntimeError("Process exited before screen capture")
                 except TimeoutExpired:
                     # Capture the screen
-                    display_num = display.new_display
                     print("Capturing...")
                     run("DISPLAY=:{} import -window root ~/test.png"
                         .format(display_num), shell=True)
 
-                    # Kill the child if it doesn't exit automaticallyj
+                    # Kill the child if it doesn't exit automatically
                     proc.kill()
 
 
 if __name__ == "__main__":
+
+    contents = ""
+    with open("test_scripts/sample_gui.py", "r") as f:
+        contents = f.read()
+
     FILES = {
-        "test.py": "import file2\nprint('Hello world')",
-        "file2.py": "print('Loaded file 2')"
+        "test.py": contents,
     }
 
-    print(run_code(FILES))
+    print(run_gui_code(FILES))
