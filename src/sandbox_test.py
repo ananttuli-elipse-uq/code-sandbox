@@ -6,10 +6,11 @@ from unittest import TestCase, main
 from sandbox import run_code
 
 class TestSandbox(TestCase):
+    """ Test the sandbox code execution """
 
     def test_basic(self):
         """ Tests basic code running """
-        FILES = {
+        files = {
             "test.py": "print('Hello world')",
         }
 
@@ -19,13 +20,13 @@ class TestSandbox(TestCase):
             "exitCode": 0
         }
 
-        result = run_code(FILES)
+        result = run_code(files)
 
         self.assertEqual(result.serialize(), output)
 
     def test_import(self):
         """ Tests importing other modules """
-        FILES = {
+        files = {
             "test.py": "import file2\nprint('Hello world')",
             "file2.py": "print('File2')",
         }
@@ -36,7 +37,7 @@ class TestSandbox(TestCase):
             "exitCode": 0
         }
 
-        result = run_code(FILES)
+        result = run_code(files)
 
         self.assertEqual(result.serialize(), output)
 

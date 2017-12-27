@@ -27,14 +27,10 @@ def get_firejail_args(tmp_path: str) -> List[str]:
         join(tmp_path, ENTRYPOINT)
     ]
 
-def get_x11_firejail_args(tmp_path: str, display_num: int) -> List[str]:
+def get_x11_firejail_args(tmp_path: str) -> List[str]:
     """ Gets the x11 firejail parameters """
 
-    args = [
-        # "DISPLAY=:{}".format(display_num)
-    ]
-
-    args.extend(get_firejail_args(tmp_path))
+    args = get_firejail_args(tmp_path)
 
     args.append("--x11")
 
@@ -86,7 +82,7 @@ def run_gui_code(files: Files):
         with Xvfb() as display:
             # Launch the tkinter problem
             display_num = display.new_display
-            args = get_x11_firejail_args(tmp, display_num)
+            args = get_x11_firejail_args(tmp)
             print(" ".join(args))
             with Popen(args, stdout=PIPE, stderr=PIPE) as proc:
                 try:

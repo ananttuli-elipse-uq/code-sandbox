@@ -14,11 +14,13 @@ from typing import Dict
 Files = Dict[str, str]
 
 class TestResult:
+    """ Stores a test result """
     exitCode: int
     stdout: str
     stderr: str
 
     def serialize(self):
+        """ Serializes the object into a dict """
         return {
             "exitCode": self.exitCode,
             "stdout": self.stdout,
