@@ -4,11 +4,13 @@
 Sandboxes code execution
 """
 
+from base64 import b64encode
 from os.path import join
 from subprocess import Popen, run, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
 from typing import List
 from xvfbwrapper import Xvfb
+
 from typings import Files, TestResult
 
 TIMEOUT = 1
@@ -77,26 +79,39 @@ def run_gui_code(files: Files):
     """
     with TemporaryDirectory() as tmp:
 
+        result = TestResult()
         write_files(tmp, files)
 
         with Xvfb() as display:
             # Launch the tkinter problem
             display_num = display.new_display
             args = get_x11_firejail_args(tmp)
-            print(" ".join(args))
+
             with Popen(args, stdout=PIPE, stderr=PIPE) as proc:
                 try:
                     proc.wait(TIMEOUT)
                     raise RuntimeError("Process exited before screen capture")
+
                 except TimeoutExpired:
                     # Capture the screen
                     print("Capturing...")
-                    run("DISPLAY=:{} import -window root ~/test.png"
-                        .format(display_num), shell=True)
+                    img_path = join(tmp, "output.jpg")
+                    run("DISPLAY=:{} import -window root {}"
+                        .format(display_num, img_path), shell=True)
+
+                    img_data = ""
+                    with open(img_path, "rb") as img:
+                        img_data = b64encode(img.read())
 
                     # Kill the child if it doesn't exit automatically
                     proc.kill()
 
+                    result.img = img_data.decode()
+                    result.stdout = None
+                    result.stderr = None
+                    result.exitCode = proc.returncode
+
+    return result
 
 if __name__ == "__main__":
 

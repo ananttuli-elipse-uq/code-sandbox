@@ -15,16 +15,20 @@ Files = Dict[str, str]
 
 class TestResult:
     """ Stores a test result """
-    exitCode: int
-    stdout: str
-    stderr: str
+    exitCode: int = None
+    stdout: str = None
+    stderr: str = None
+
+    # The contents of the X11 window
+    img: str = None
 
     def serialize(self):
         """ Serializes the object into a dict """
         return {
             "exitCode": self.exitCode,
             "stdout": self.stdout,
-            "stderr": self.stderr
+            "stderr": self.stderr,
+            "img": self.img
         }
 
     def __repr__(self):

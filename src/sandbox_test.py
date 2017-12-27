@@ -3,7 +3,7 @@ Tests the sandbox module
 """
 
 from unittest import TestCase, main
-from sandbox import run_code
+from sandbox import run_code, run_gui_code
 
 class TestSandbox(TestCase):
     """ Test the sandbox code execution """
@@ -17,7 +17,8 @@ class TestSandbox(TestCase):
         output = {
             "stdout": "Hello world\n",
             "stderr": "",
-            "exitCode": 0
+            "exitCode": 0,
+            "img": None
         }
 
         result = run_code(files)
@@ -26,6 +27,7 @@ class TestSandbox(TestCase):
 
     def test_import(self):
         """ Tests importing other modules """
+
         files = {
             "test.py": "import file2\nprint('Hello world')",
             "file2.py": "print('File2')",
@@ -34,12 +36,37 @@ class TestSandbox(TestCase):
         output = {
             "stdout": "File2\nHello world\n",
             "stderr": "",
-            "exitCode": 0
+            "exitCode": 0,
+            "img": None
         }
 
         result = run_code(files)
 
         self.assertEqual(result.serialize(), output)
+
+
+class TestGuiSandbox(TestCase):
+    """ Tests GUI sandboxing """
+
+    def test_simple_gui(self):
+        """ Tests importing other modules """
+
+        script_contents = ""
+        with open("./src/test_scripts/sample_gui.py", "r") as script:
+            script_contents = script.read()
+
+        files = {
+            "test.py": script_contents,
+        }
+
+        img_data = ""
+        with open("./src/test_scripts/sample_gui_img_out", "r") as img:
+            img_data = img.read().strip()
+
+        result = run_gui_code(files)
+
+        # Check to see if it produces the correct image
+        self.assertEqual(result.img, img_data)
 
 
 if __name__ == "__main__":
