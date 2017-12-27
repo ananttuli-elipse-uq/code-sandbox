@@ -22,3 +22,7 @@ $ pip3 install -r requirements.txt
 
 ## Running
 
+The included Makefile has the following targets:
+
+- `test`: Run tests
+- `lint`: Runs the linter
