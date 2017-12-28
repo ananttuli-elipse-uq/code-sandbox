@@ -26,3 +26,11 @@ The included Makefile has the following targets:
 
 - `test`: Run tests
 - `lint`: Runs the linter
+
+## Verifying the sandboxing is working
+
+To verify that firejail and other components are installed correctly, run:
+
+```bash
+$ make test
+```
