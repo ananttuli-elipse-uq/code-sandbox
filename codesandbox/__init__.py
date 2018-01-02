@@ -7,7 +7,13 @@ The REST api server for the coderunner
 from flask import Flask, request
 from json import dumps
 from typing import Dict
+from os import environ
 from codesandbox.sandbox import run_code, run_gui_code
+
+# Load environment variables
+import codesandbox.settings
+
+API_KEY = environ.get("API_KEY")
 
 app = Flask(__name__)
 
@@ -21,6 +27,11 @@ def validate_request(request: Dict) -> bool:
 
     # Check that the gui flag is there
     assert "isGui" in request, "no 'isGui' field in payload"
+
+    assert "apiKey" in request, "no 'apiKey' field in payload"
+
+    # Check the api key is correct
+    assert request["apiKey"] == API_KEY, "apiKey is incorrect"
 
 def generate_error_response(message: str) -> Dict:
     """ Generates an error message to send over the send over the API
