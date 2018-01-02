@@ -8,12 +8,12 @@ from base64 import b64encode
 from os.path import join
 from subprocess import Popen, run, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
-from typing import List
 from xvfbwrapper import Xvfb
+from typing import List
 
-from typings import Files, TestResult
+from codesandbox.typings import Files, TestResult
 
-TIMEOUT = 1
+TIMEOUT = 0.5
 ENTRYPOINT = "test.py"
 PYTHON_EXEC = "python3"
 FIREJAIL_EXEC = "firejail"
@@ -34,6 +34,7 @@ def get_x11_firejail_args(tmp_path: str) -> List[str]:
 
     args = get_firejail_args(tmp_path)
 
+    # Append the x11 flag
     args.append("--x11")
 
     return args

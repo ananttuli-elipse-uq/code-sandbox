@@ -1,5 +1,9 @@
 lint:
-	python3 -m pylint src
+	python3 -m pylint codesandbox
 
 test:
-	python3 src/*_test.py
+	python3 codesandbox/*_test.py
+
+dev:
+	pip3 install -e .
+	FLASK_APP=codesandbox FLASK_DEBUG=true flask run --host=0.0.0.0

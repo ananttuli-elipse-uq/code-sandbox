@@ -3,7 +3,7 @@ Tests the sandbox module
 """
 
 from unittest import TestCase, main
-from sandbox import run_code, run_gui_code
+from codesandbox.sandbox import run_code, run_gui_code
 
 class TestSandbox(TestCase):
     """ Test the sandbox code execution """
@@ -52,7 +52,7 @@ class TestGuiSandbox(TestCase):
         """ Tests importing other modules """
 
         script_contents = ""
-        with open("./src/test_scripts/sample_gui.py", "r") as script:
+        with open("./codesandbox/test_scripts/sample_gui.py", "r") as script:
             script_contents = script.read()
 
         files = {
@@ -60,7 +60,7 @@ class TestGuiSandbox(TestCase):
         }
 
         img_data = ""
-        with open("./src/test_scripts/sample_gui_img_out", "r") as img:
+        with open("./codesandbox/test_scripts/sample_gui_img_out", "r") as img:
             img_data = img.read().strip()
 
         result = run_gui_code(files)
