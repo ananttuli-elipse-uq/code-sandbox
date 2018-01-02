@@ -2,6 +2,7 @@ lint:
 	python3 -m pylint codesandbox
 
 test:
+	pip3 install -e .
 	python3 codesandbox/*_test.py
 
 dev:

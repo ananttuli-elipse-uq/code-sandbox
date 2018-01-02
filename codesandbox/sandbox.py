@@ -26,7 +26,7 @@ def get_firejail_args(tmp_path: str) -> List[str]:
         "--private={}".format(tmp_path),
         "--quiet",
         PYTHON_EXEC,
-        join(tmp_path, ENTRYPOINT)
+        ENTRYPOINT
     ]
 
 def get_x11_firejail_args(tmp_path: str) -> List[str]:
