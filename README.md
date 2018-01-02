@@ -44,7 +44,7 @@ $ make test
 
 <table>
     <tr>
-        <td>`/run`</td>
+        <td><code>/run</code></td>
         <td>POST</td>
         <td>Executes and returns the result of provided code</td>
     </tr>
