@@ -40,6 +40,22 @@ To verify that firejail and other components are installed correctly, run:
 $ make test
 ```
 
+## Deploying
+
+### Running gunicorn
+```
+$ gunicorn -w 4 --bind 0.0.0.0:8000 codesandbox:app
+```
+
+### Deploying with Supervisor
+```
+$ apt install supervisor
+# Modify codesandbox.conf to contain the correct values for project directory
+$ cp codesandbox.conf /etc/supervisor/conf.d/codesandbox.conf
+$ supervisorctl reread
+$ supervisorctl update
+```
+
 ## Endpoints
 
 <table>
