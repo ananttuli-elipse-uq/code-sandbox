@@ -8,8 +8,8 @@ from base64 import b64encode
 from os.path import join
 from subprocess import Popen, run, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
-from xvfbwrapper import Xvfb
 from typing import List
+from xvfbwrapper import Xvfb
 
 from codesandbox.typings import Files, TestResult
 
@@ -108,7 +108,7 @@ def run_gui_code(files: Files):
 
                     return result
 
-                except TimeoutExpired:
+                except TimeoutExpired as timeout:
                     # Capture the screen
                     img_path = join(tmp, "output.jpg")
                     run("DISPLAY=:{} import -window root {}"
@@ -122,20 +122,8 @@ def run_gui_code(files: Files):
                     proc.kill()
 
                     result.img = img_data.decode()
-                    result.stdout = proc.stdout.read().decode()
-                    result.stderr = proc.stderr.read().decode()
+                    result.stdout = timeout.stdout
+                    result.stderr = timeout.stderr
                     result.exitCode = proc.returncode
 
     return result
-
-if __name__ == "__main__":
-
-    contents = ""
-    with open("test_scripts/sample_gui.py", "r") as f:
-        contents = f.read()
-
-    FILES = {
-        "test.py": contents,
-    }
-
-    print(run_gui_code(FILES))
