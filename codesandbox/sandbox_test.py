@@ -57,6 +57,9 @@ class TestSandbox(TestCase):
             "img": None
         }
 
+        result = run_code(files)
+
+        self.assertEqual(result.serialize(), output)
 
 class TestGuiSandbox(TestCase):
     """ Tests GUI sandboxing """

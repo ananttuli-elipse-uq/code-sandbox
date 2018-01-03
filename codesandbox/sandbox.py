@@ -61,24 +61,24 @@ def run_code(files: Files) -> TestResult:
 
         args = get_firejail_args(tmp)
 
-        try:
-            firejail = run(args, stdout=PIPE, stderr=PIPE, timeout=TIMEOUT)
-        except TimeoutExpired:
-            result = TestResult()
-            result.stdout = ""
-            result.stderr = "Code did not finish, possible infinite loop"
-            result.exitCode = 1
+        with Popen(args, stdout=PIPE, stderr=PIPE) as proc:
+            try:
+                proc.wait(TIMEOUT)
 
-            return result
+                result = TestResult()
+                result.stdout = proc.stdout.read().decode()
+                result.stderr = proc.stderr.read().decode()
+                result.exitCode = proc.returncode
 
+                return result
 
-    result = TestResult()
-    result.stdout = firejail.stdout.decode()
-    result.stderr = firejail.stderr.decode()
-    result.exitCode = firejail.returncode
+            except TimeoutExpired:
+                result = TestResult()
+                result.stdout = ""
+                result.stderr = "Code did not finish, possible infinite loop"
+                result.exitCode = 1
 
-    return result
-
+                return result
 
 
 def run_gui_code(files: Files):
