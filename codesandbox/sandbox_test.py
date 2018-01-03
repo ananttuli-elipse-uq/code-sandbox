@@ -44,6 +44,19 @@ class TestSandbox(TestCase):
 
         self.assertEqual(result.serialize(), output)
 
+    def test_infinite_loop(self):
+        """ Tests that infinite loops are terminated """
+        files = {
+            "test.py": "while 1:\n\tprint('test')"
+        }
+
+        output = {
+            "stdout": "",
+            "stderr": "Code did not finish, possible infinite loop",
+            "exitCode": 1,
+            "img": None
+        }
+
 
 class TestGuiSandbox(TestCase):
     """ Tests GUI sandboxing """

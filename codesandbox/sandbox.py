@@ -61,7 +61,16 @@ def run_code(files: Files) -> TestResult:
 
         args = get_firejail_args(tmp)
 
-        firejail = run(args, stdout=PIPE, stderr=PIPE)
+        try:
+            firejail = run(args, stdout=PIPE, stderr=PIPE, timeout=TIMEOUT)
+        except TimeoutExpired:
+            result = TestResult()
+            result.stdout = ""
+            result.stderr = "Code did not finish, possible infinite loop"
+            result.exitCode = 1
+
+            return result
+
 
     result = TestResult()
     result.stdout = firejail.stdout.decode()
