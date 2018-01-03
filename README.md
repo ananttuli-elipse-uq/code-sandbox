@@ -40,6 +40,26 @@ To verify that firejail and other components are installed correctly, run:
 $ make test
 ```
 
+## Deploying
+
+### Running gunicorn for debugging
+```
+$ gunicorn -w 4 --bind 0.0.0.0:8000 codesandbox:app
+```
+
+### Deploying with Supervisor
+
+> NOTE: The code-sandbox repo should be located in the user's home directory
+> and the `user` in the config should be the current user
+
+```
+$ apt install supervisor
+# Modify gunicorn.conf to contain the correct values for project directory
+$ cp gunicorn.conf /etc/supervisor/conf.d/guicorn.conf
+$ supervisorctl reread
+$ supervisorctl update
+```
+
 ## Endpoints
 
 <table>
