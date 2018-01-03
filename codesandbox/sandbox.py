@@ -100,11 +100,16 @@ def run_gui_code(files: Files):
             with Popen(args, stdout=PIPE, stderr=PIPE) as proc:
                 try:
                     proc.wait(TIMEOUT)
-                    raise RuntimeError("Process exited before screen capture")
+                    # Catch syntax errors
+                    result = TestResult()
+                    result.stdout = proc.stdout.read().decode()
+                    result.stderr = proc.stderr.read().decode()
+                    result.exitCode = proc.returncode
+
+                    return result
 
                 except TimeoutExpired:
                     # Capture the screen
-                    print("Capturing...")
                     img_path = join(tmp, "output.jpg")
                     run("DISPLAY=:{} import -window root {}"
                         .format(display_num, img_path), shell=True)
@@ -117,8 +122,8 @@ def run_gui_code(files: Files):
                     proc.kill()
 
                     result.img = img_data.decode()
-                    result.stdout = None
-                    result.stderr = None
+                    result.stdout = proc.stdout.read().decode()
+                    result.stderr = proc.stderr.read().decode()
                     result.exitCode = proc.returncode
 
     return result
