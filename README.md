@@ -8,7 +8,7 @@ any other cloud hosting platform.
 
 ## Requirements
 
-- Python 3.6 (`apt install python3 python3-pip`)
+- Python 3.6 (`apt install python3 python3-pip python3-tk`)
 - Firejail (`apt install firejail`)
 - Xvfb (`apt install xvfb`)
 - ImageMagick (`apt install imagemagick`)
