@@ -54,7 +54,7 @@ def run():
             "files": {
                 "test.py": "print('Hello world')"
             },
-            isGui: false
+            "isGui": false
         }
     """
     try:

@@ -73,8 +73,9 @@ def run_code(files: Files) -> TestResult:
                 return result
 
             except TimeoutExpired:
+                proc.terminate()
                 result = TestResult()
-                result.stdout = ""
+                result.stdout = proc.stdout.read().decode()
                 result.stderr = "Code did not finish, possible infinite loop"
                 result.exitCode = 1
 
@@ -108,7 +109,7 @@ def run_gui_code(files: Files):
 
                     return result
 
-                except TimeoutExpired as timeout:
+                except TimeoutExpired:
                     # Capture the screen
                     img_path = join(tmp, "output.jpg")
                     run("DISPLAY=:{} import -window root {}"
@@ -119,11 +120,11 @@ def run_gui_code(files: Files):
                         img_data = b64encode(img.read())
 
                     # Kill the child if it doesn't exit automatically
-                    proc.kill()
+                    proc.terminate()
 
                     result.img = img_data.decode()
-                    result.stdout = timeout.stdout
-                    result.stderr = timeout.stderr
+                    result.stdout = proc.stdout.read().decode()
+                    result.stderr = proc.stderr.read().decode()
                     result.exitCode = proc.returncode
 
     return result
