@@ -115,7 +115,7 @@ def run_gui_code(files: Files):
                 except TimeoutExpired:
                     # Capture the screen
                     img_path = join(tmp, "output.jpg")
-                    run("DISPLAY=:{} import -window root {}"
+                    run("DISPLAY=:{} import -window root -trim {}"
                         .format(display_num, img_path), shell=True)
 
                     img_data = ""
