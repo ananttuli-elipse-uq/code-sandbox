@@ -74,8 +74,11 @@ def run_code(files: Files) -> TestResult:
 
             except TimeoutExpired:
                 proc.terminate()
+                proc.wait()
+
                 result = TestResult()
-                result.stdout = proc.stdout.read().decode()
+                # TODO: Figure out how to get stdout from this
+                result.stdout = ""
                 result.stderr = "Code did not finish, possible infinite loop"
                 result.exitCode = 1
 
@@ -121,6 +124,7 @@ def run_gui_code(files: Files):
 
                     # Kill the child if it doesn't exit automatically
                     proc.terminate()
+                    proc.wait()
 
                     result.img = img_data.decode()
                     result.stdout = proc.stdout.read().decode()

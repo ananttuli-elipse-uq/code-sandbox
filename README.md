@@ -8,7 +8,8 @@ any other cloud hosting platform.
 
 ## Requirements
 
-- Python 3.6 (`apt install python3 python3-pip python3-tk`)
+- Python 3.6 (`apt install python3 python3-pip python3-tk python3-flask
+  python3-gunicorn`)
 - Firejail (`apt install firejail`)
 - Xvfb (`apt install xvfb`)
 - ImageMagick (`apt install imagemagick`)
@@ -53,9 +54,9 @@ $ gunicorn -w 4 --bind 0.0.0.0:8000 codesandbox:app
 > and the `user` in the config should be the current user
 
 ```
-$ apt install supervisor
+$ apt install supervisor python3-gunicorn
 # Modify gunicorn.conf to contain the correct values for project directory
-$ cp gunicorn.conf /etc/supervisor/conf.d/guicorn.conf
+$ cp gunicorn.conf /etc/supervisor/conf.d/gunicorn.conf
 $ supervisorctl reread
 $ supervisorctl update
 ```

@@ -68,6 +68,8 @@ def run():
     isGui = req["isGui"]
 
     if isGui:
+        app.logger.info("Executing GUI code")
         return dumps(run_gui_code(files).serialize())
 
+    app.logger.info("Executing normal code")
     return dumps(run_code(files).serialize())
