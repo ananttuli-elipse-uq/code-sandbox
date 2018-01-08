@@ -1,12 +1,16 @@
 import matplotlib as mpl
-mpl.use('TkAgg')
+mpl.use('Agg')
 
 import matplotlib.pyplot as plt
+print("Imported matplotlib")
+print(plt)
 import numpy as np
+print("Imported numpy")
 # Disable interactive mode
 plt.ioff()
 
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(9, 4))
+print("Got here")
 
 # generate some random test data
 all_data = [np.random.normal(0, std, 100) for std in range(6, 10)]
@@ -31,4 +35,6 @@ for ax in axes:
 # add x-tick labels
 plt.setp(axes, xticks=[y+1 for y in range(len(all_data))],
          xticklabels=['x1', 'x2', 'x3', 'x4'])
-plt.show()
+# plt.show()
+print(plt)
+plt.savefig("~/output.png")

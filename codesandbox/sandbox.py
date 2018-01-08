@@ -5,7 +5,7 @@ Sandboxes code execution
 """
 
 from base64 import b64encode
-from os.path import join
+from os.path import join, isfile
 from subprocess import Popen, run, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
 from typing import List
@@ -13,7 +13,7 @@ from xvfbwrapper import Xvfb
 
 from codesandbox.typings import Files, TestResult
 
-TIMEOUT = 0.5
+TIMEOUT = 2
 ENTRYPOINT = "test.py"
 PYTHON_EXEC = "python3"
 FIREJAIL_EXEC = "firejail"
@@ -25,7 +25,6 @@ def get_firejail_args(tmp_path: str) -> List[str]:
         FIREJAIL_EXEC,
         "--private={}".format(tmp_path),
         "--quiet",
-        "--seccomp",
         "--private-dev",
         PYTHON_EXEC,
         ENTRYPOINT
@@ -71,6 +70,17 @@ def run_code(files: Files) -> TestResult:
                 result.stdout = proc.stdout.read().decode()
                 result.stderr = proc.stderr.read().decode()
                 result.exitCode = proc.returncode
+
+                img_path = join(tmp, "output.png")
+
+
+                # Check if it creates an image (matplotlib)
+                if isfile(img_path):
+                    img_data = ""
+                    with open(img_path, "rb") as img:
+                        img_data = b64encode(img.read())
+
+                    result.img = img_data.decode()
 
                 return result
 

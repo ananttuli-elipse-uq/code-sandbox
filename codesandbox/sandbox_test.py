@@ -2,6 +2,7 @@
 Tests the sandbox module
 """
 
+from base64 import b64encode
 from unittest import TestCase, main
 from codesandbox.sandbox import run_code, run_gui_code
 
@@ -135,14 +136,12 @@ class TestGuiSandbox(TestCase):
         }
 
         img_data = ""
-        with open("./codesandbox/test_scripts/sample_gui_img_out", "r") as img:
-            img_data = img.read().strip()
+        with open("./codesandbox/test_scripts/test_matplotlib_out.png", "rb") as img:
+            img_data = b64encode(img.read()).decode()
 
-        result = run_gui_code(files)
+        result = run_code(files)
 
-        # Check to see if it produces the correct image
-        # TODO: Fix this
-        # print(result.img)
+        self.assertEqual(result.img, img_data)
 
 if __name__ == "__main__":
     main()

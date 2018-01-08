@@ -70,3 +70,8 @@ $ supervisorctl update
         <td>Executes and returns the result of provided code</td>
     </tr>
 </table>
+
+## Matplotlib
+
+Matplotlib has some issues with seccomp, in `/etc/firejail/default.profile`
+comment out the `seccomp` line then it should work.
