@@ -74,4 +74,4 @@ $ supervisorctl update
 ## Matplotlib
 
 Matplotlib has some issues with seccomp, in `/etc/firejail/default.profile`
-comment out the `seccomp` line then it should work.
+and `/etc/firejail/server.profile`, comment out the `seccomp` line then it should work.
