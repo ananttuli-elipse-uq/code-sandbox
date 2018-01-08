@@ -25,6 +25,8 @@ def get_firejail_args(tmp_path: str) -> List[str]:
         FIREJAIL_EXEC,
         "--private={}".format(tmp_path),
         "--quiet",
+        "--seccomp",
+        "--private-dev",
         PYTHON_EXEC,
         ENTRYPOINT
     ]

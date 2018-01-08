@@ -61,6 +61,24 @@ class TestSandbox(TestCase):
 
         self.assertEqual(result.serialize(), output)
 
+    def test_networking(self):
+        """ Tests that scripts cannot access the internet """
+
+        script_contents = ""
+        with open("./codesandbox/test_scripts/test_network.py", "r") as script:
+            script_contents = script.read()
+
+        files = {
+            "test.py": script_contents,
+        }
+
+
+        result = run_code(files)
+
+        # Should throw an exception and return nothing on stdout
+        self.assertEqual(result.stdout, "")
+        self.assertNotEqual(result.stderr, "")
+
 class TestGuiSandbox(TestCase):
     """ Tests GUI sandboxing """
 
@@ -105,6 +123,26 @@ class TestGuiSandbox(TestCase):
         self.assertEqual(result.img, img_data)
         self.assertEqual(result.stdout, "Output from signal handler\n")
 
+    def test_matplotlib(self):
+        """ Tests a simple matplotlib plot """
+
+        script_contents = ""
+        with open("./codesandbox/test_scripts/test_matplotlib.py", "r") as script:
+            script_contents = script.read()
+
+        files = {
+            "test.py": script_contents,
+        }
+
+        img_data = ""
+        with open("./codesandbox/test_scripts/sample_gui_img_out", "r") as img:
+            img_data = img.read().strip()
+
+        result = run_gui_code(files)
+
+        # Check to see if it produces the correct image
+        # TODO: Fix this
+        # print(result.img)
 
 if __name__ == "__main__":
     main()
