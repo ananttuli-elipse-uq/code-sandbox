@@ -7,4 +7,4 @@ test:
 
 dev:
 	pip3 install -e .
-	FLASK_APP=codesandbox FLASK_DEBUG=true flask run --host=0.0.0.0
+	FLASK_APP=codesandbox FLASK_DEBUG=true flask run --host=0.0.0.0 --port=8000

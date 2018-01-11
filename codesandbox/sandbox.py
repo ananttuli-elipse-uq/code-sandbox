@@ -10,15 +10,24 @@ from subprocess import Popen, run, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
 from typing import List
 from xvfbwrapper import Xvfb
+from signal import SIGINT
 
 from codesandbox.typings import Files, TestResult
 
-TIMEOUT = 2
+TIMEOUT = 4
 ENTRYPOINT = "test.py"
 PYTHON_EXEC = "python3"
 FIREJAIL_EXEC = "firejail"
 
-def get_firejail_args(tmp_path: str) -> List[str]:
+def get_firejail_kill_args(tmp_file: str) -> List[str]:
+    """ Gets the firejail args to kill a sandbox """
+
+    return [
+        FIREJAIL_EXEC,
+        "--shutdown={}".format(tmp_file)
+    ]
+
+def get_firejail_args(tmp_path: str, tmp_file: str) -> List[str]:
     """ Gets the firejail command to run """
 
     return [
@@ -26,14 +35,15 @@ def get_firejail_args(tmp_path: str) -> List[str]:
         "--private={}".format(tmp_path),
         "--quiet",
         "--private-dev",
+        "--name={}".format(tmp_file),
         PYTHON_EXEC,
         ENTRYPOINT
     ]
 
-def get_x11_firejail_args(tmp_path: str) -> List[str]:
+def get_x11_firejail_args(tmp_path: str, tmp_file: str) -> List[str]:
     """ Gets the x11 firejail parameters """
 
-    args = get_firejail_args(tmp_path)
+    args = get_firejail_args(tmp_path, tmp_file)
 
     # Append the x11 flag
     args.append("--x11")
@@ -60,7 +70,9 @@ def run_code(files: Files) -> TestResult:
     with TemporaryDirectory() as tmp:
         write_files(tmp, files)
 
-        args = get_firejail_args(tmp)
+        tmp_file = tmp.split("/")[-1]
+
+        args = get_firejail_args(tmp, tmp_file)
 
         with Popen(args, stdout=PIPE, stderr=PIPE) as proc:
             try:
@@ -105,21 +117,25 @@ def run_gui_code(files: Files):
     """
     with TemporaryDirectory() as tmp:
 
+        tmp_file = tmp.split("/")[-1]
+
         result = TestResult()
         write_files(tmp, files)
 
         with Xvfb() as display:
             # Launch the tkinter problem
             display_num = display.new_display
-            args = get_x11_firejail_args(tmp)
+            args = get_x11_firejail_args(tmp, tmp_file)
+            print(" ".join(args))
 
             with Popen(args, stdout=PIPE, stderr=PIPE) as proc:
                 try:
-                    proc.wait(TIMEOUT)
+                    stdout, stderr = proc.communicate(timeout=TIMEOUT)
+
                     # Catch syntax errors
                     result = TestResult()
-                    result.stdout = proc.stdout.read().decode()
-                    result.stderr = proc.stderr.read().decode()
+                    result.stdout = stdout.decode()
+                    result.stderr = stderr.decode()
                     result.exitCode = proc.returncode
 
                     return result
@@ -134,13 +150,20 @@ def run_gui_code(files: Files):
                     with open(img_path, "rb") as img:
                         img_data = b64encode(img.read())
 
+                    run(["firejail", "--list"])
+
                     # Kill the child if it doesn't exit automatically
-                    proc.terminate()
-                    proc.wait()
+                    kill_cmd = get_firejail_kill_args(tmp_file)
+                    print(" ".join(kill_cmd))
+                    run(kill_cmd)
+                    stdout, stderr = proc.communicate()
 
                     result.img = img_data.decode()
-                    result.stdout = proc.stdout.read().decode()
-                    result.stderr = proc.stderr.read().decode()
+                    result.stdout = stdout.decode()
+                    result.stderr = stderr.decode()
                     result.exitCode = proc.returncode
+
+                    print(result.stdout)
+                    print(result.exitCode)
 
     return result
