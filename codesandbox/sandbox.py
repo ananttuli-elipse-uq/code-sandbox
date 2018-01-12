@@ -163,6 +163,10 @@ def run_gui_code(files: Files):
                     result.stderr = stderr.decode()
                     result.exitCode = proc.returncode
 
+                    # Fix for old mypy gui questions
+                    if result.stdout.strip() == "[]":
+                        result.exitCode = 0
+
                     print(result.stdout)
                     print(result.exitCode)
 
