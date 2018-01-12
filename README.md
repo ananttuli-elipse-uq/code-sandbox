@@ -73,6 +73,9 @@ $ supervisorctl update
 </table>
 
 ## Matplotlib
-
+>For Matplotlib to work it must be installed globally
+```
+apt install python3-matplotlib
+```
 Matplotlib has some issues with seccomp, in `/etc/firejail/default.profile`
 and `/etc/firejail/server.profile`, comment out the `seccomp` line then it should work.
