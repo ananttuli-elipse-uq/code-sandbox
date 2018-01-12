@@ -44,8 +44,9 @@ $ make test
 ## Deploying
 
 ### Running gunicorn for debugging
+The gunicorn command has to be run trough python3 as otherwise it defaults to python2
 ```
-$ gunicorn -w 4 --bind 0.0.0.0:8000 codesandbox:app
+$ python3 -m gunicorn.app.wsgiapp -w 4 --bind 0.0.0.0:8000 codesandbox:app
 ```
 
 ### Deploying with Supervisor
