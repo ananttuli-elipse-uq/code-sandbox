@@ -163,8 +163,14 @@ def run_gui_code(files: Files):
                     result.stderr = stderr.decode()
                     result.exitCode = proc.returncode
 
-                    # Fix for old mypy gui questions
-                    if result.stdout.strip() == "[]":
+                    # Fix for old mypy gui questions, ensuring all tests
+                    # are correct. Exit code 15 is always received
+                    result_iterator = result.stdout.strip().split("},")
+                    correct_attempt = True
+                    for test in result_iterator:
+                        if test.find('"correct": true') == -1:
+                            correct_attempt = False
+                    if (correct_attempt or result.stdout.strip() == "[]") and result.exitCode == 15:
                         result.exitCode = 0
 
                     print(result.stdout)
